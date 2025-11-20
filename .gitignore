@@ -1,0 +1,10 @@
+*.vsix
+.DS_Store
+node_modules/
+out/
+dist/
+.vscode-test/
+*.js.map
+Thumbs.db
+.env
+.vscode/settings.json
