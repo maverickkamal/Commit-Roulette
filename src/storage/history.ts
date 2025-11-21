@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 
 export interface CurseHistoryEntry {
     timestamp: number;
-    curseTye: string;
+    curseType: string;
     backupId: string;
     wasUndone: boolean;
 }
