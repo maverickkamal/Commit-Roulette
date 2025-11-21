@@ -18,7 +18,7 @@ export class DashboardPanel {
             : undefined;
 
         if (DashboardPanel.currentPanel) {
-            DashboardPanel.currentPanel._panel.reveal(column);
+            DashboardPanel.currentPanel.panel.reveal(column);
             return;
         }
 
@@ -38,7 +38,7 @@ export class DashboardPanel {
 
     public dispose() {
         DashboardPanel.currentPanel = undefined;
-        this._panel.dispose();
+        this.panel.dispose();
         while (this._disposables.length) {
             const x = this._disposables.pop();
             if (x) {
@@ -48,8 +48,8 @@ export class DashboardPanel {
     }
 
     private async _update() {
-        const webview = this._panel.webview;
-        this._panel.webview.html = await this._getHtmlForWebview(webview);
+        const webview = this.panel.webview;
+        this.panel.webview.html = await this._getHtmlForWebview(webview);
     }
 
     private async _getHtmlForWebview(webview: vscode.Webview) {

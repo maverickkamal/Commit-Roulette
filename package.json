@@ -21,15 +21,15 @@
       },
       {
         "command": "commitRoulette.showStats",
-        "title": "COmmit ROulette: Show Statistics"
+        "title": "Commit Roulette: Show Statistics"
       },
       {
         "command": "commitRoulette.testCurse",
-        "title": "Commit ROulette: Trigger Test Curse"
+        "title": "Commit Roulette: Trigger Test Curse"
       }
     ],
     "configuration": {
-      "title": "Commit ROulette",
+      "title": "Commit Roulette",
       "properties": {
         "commitRoulette.enabled": {
           "type": "boolean",
@@ -41,7 +41,7 @@
           "default": 1,
           "minimum": 0,
           "maximum": 100,
-          "description": "Curse trigger chance (0-100%"
+          "description": "Curse trigger chance (0-100%)"
         },
         "commitRoulette.enabledCurses": {
           "type": "array",
@@ -52,7 +52,7 @@
         },
         "commitRoulette.soundVolume": {
           "type": "number",
-          "drfault": 50,
+          "default": 50,
           "description": "Volume for sound effects (0-100)"
         }
       }

@@ -17,7 +17,7 @@ export class BackupManager {
 
         const files = await vscode.workspace.findFiles(
             '**/*',
-            '{**/node_modules/**,**/.git/**,**/out/**,**/dist/**,**/.vscode-test/**'
+            '**/node_modules/**,**/.git/**,**/out/**,**/dist/**,**/.vscode-test/**'
         );
 
         for (const file of files) {

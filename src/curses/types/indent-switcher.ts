@@ -17,7 +17,7 @@ export class IndentSwitcher implements Curse {
         const insertSpaces = options.insertSpaces;
 
         if (insertSpaces) {
-            await vscode.commands.executeCommand('edito.action.indentationToTabs');
+            await vscode.commands.executeCommand('editor.action.indentationToTabs');
             vscode.window.showInformationMessage('Commit Roulette: Converted to TABS!!!!!');
         } else {
             await vscode.commands.executeCommand('editor.action.indentationToSpaces');

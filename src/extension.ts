@@ -4,7 +4,6 @@ import { BackupManager } from './git/backup-manager';
 import { CurseEngine } from './curses/curse-engine';
 import { HistoryStore } from './storage/history';
 import { DashboardPanel } from './ui/dashboard';
-import exp = require('constants');
 
 
 export function activate(context: vscode.ExtensionContext) {
