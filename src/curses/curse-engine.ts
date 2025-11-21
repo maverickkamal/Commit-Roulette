@@ -5,6 +5,9 @@ import { HistoryStore  } from '../storage/history';
 import {
     ColorInverter,
     ComicSansTheme,
-    PlaceboCurse
+    PlaceboCurse,
+    VariableReverser,
+    IndentSwitcher,
+    EmojiInjector
 
 } from './types';

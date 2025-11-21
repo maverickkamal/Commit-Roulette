@@ -1,3 +1,6 @@
 export * from './color-inverter'
 export * from './comic-sans-theme'
 export * from './pacebo-curse'
+export * from './variable-reverser'
+export * from './indent-switcher'
+export * from './emoji-injector'
