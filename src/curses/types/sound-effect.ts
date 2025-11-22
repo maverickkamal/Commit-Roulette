@@ -20,20 +20,27 @@ export class SoundEffect implements Curse {
             }
         );
 
-        const soundUrl = 'https://www.myinstants.com/media/sounds/airhorn.mp3';
+        const soundUrl = 'https://www.actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg';
 
         panel.webview.html = `
             <!DOCTYPE html>
             <html>
+            <head>
+                <meta http-equiv="Content-Security-Policy" content="default-src *; media-src *;">
+            </head>
             <body>
-                <audio autoplay src="${soundUrl}" onended="end()"></audio>
+                <p>Playing sound...</p>
+                <audio autoplay src="${soundUrl}" onended="end()" onerror="err()"></audio>
                 <script>
                     const vscode = acquireVsCodeApi();
                     function end() {
-                        setTimeout(() => {
-                            vscode.postMessage({ command: 'finished' });
-                        }, 1000);
+                        vscode.postMessage({ command: 'finished' });
                     }
+                    function err() {
+                        console.error('Audio failed to load');
+                        vscode.postMessage({ command: 'finished' });
+                    }
+                    setTimeout(end, 3000);
                 </script>
             </body>
             </html>

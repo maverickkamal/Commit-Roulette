@@ -10,14 +10,28 @@ export class ComicSansTheme implements Curse {
         return true;
     }
 
+    private originalFont: string | undefined;
+    private timeout: NodeJS.Timeout | undefined;
+
+
     async apply(): Promise<void> {
         const config = vscode.workspace.getConfiguration('editor');
-        const originalFont = config.get<string>('fontFamily');
+        this.originalFont = config.get<string>('fontFamily');
 
         await config.update('fontFamily', "'Comic Sans MS', 'Chalkboard SE', 'Comic Nueue', sans-serif", vscode.ConfigurationTarget.Global)
-        setTimeout(async () => {
-            await config.update('fontFamily', originalFont, vscode.ConfigurationTarget.Global);
+        this.timeout = setTimeout(async () => {
             vscode.window.showInformationMessage('Commit Roulette: Comic Sans curse lifted');
         }, 10 * 60 * 1000);
+    }
+
+    async undo(): Promise<void> {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = undefined;
+        }
+        if (this.originalFont !== undefined) {
+            const config = vscode.workspace.getConfiguration('editor');
+            await config.update('fontFamily', this.originalFont, vscode.ConfigurationTarget.Global);
+        }
     }
 }

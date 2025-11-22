@@ -101,10 +101,18 @@ export class CurseEngine {
     }
 
     async undoLastCurse(backupId?: string) {
+        const lastEntry = await this.historyStore.getLastEntry();
+        if (lastEntry && !lastEntry.wasUndone) {
+            const curse = this.curses.find(c => c.name === lastEntry.curseType);
+            if (curse && curse.undo) {
+                await curse.undo();
+                vscode.window.showInformationMessage(`Commit Roulette: ${curse.name} undone!`);
+                return;
+            }
+        }
         if (!backupId) {
 
-            const last = await this.historyStore.getLastEntry();
-            if (last) backupId = last.backupId;
+            if (lastEntry) backupId = lastEntry.backupId;
         }
 
         if (backupId) {

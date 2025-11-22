@@ -20,9 +20,7 @@ export class CommitDetector {
     }
     
     async startWatching() {
-        if (this.isWatching) {
-            return;
-        }
+        if (this.isWatching) return;
         this.isWatching = true;
         
         try {

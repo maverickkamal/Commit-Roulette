@@ -9,12 +9,15 @@ export class ColorInverter implements Curse {
         return true;
     }
 
+    private originalTheme: string | undefined;
+    private timeout: NodeJS.Timeout | undefined;
+
     async apply(): Promise<void> {
         const config = vscode.workspace.getConfiguration('workbench');
-        const currentTheme = config.get<string>('colorTheme');
+        this.originalTheme = config.get<string>('colorTheme');
 
         let newTheme = 'Default Light+';
-        if (currentTheme && (currentTheme.includes('Light') || currentTheme.includes('white'))) {
+        if (this.originalTheme && (this.originalTheme.includes('Light') || this.originalTheme.includes('white'))) {
             newTheme = 'Default Dark+';
         } else {
             newTheme = 'Default Light+';
@@ -22,9 +25,20 @@ export class ColorInverter implements Curse {
 
         await config.update('colorTheme', newTheme, vscode.ConfigurationTarget.Global);
 
-        setTimeout(async () => {
-            await config.update('colorTheme', currentTheme, vscode.ConfigurationTarget.Global);
+        this.timeout = setTimeout(async () => {
+            await this.undo();
             vscode.window.showInformationMessage('Commit Roulette: Color Inverter curse lifted!');
         }, 5 * 60 * 1000);
+    }
+
+    async undo(): Promise<void> {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = undefined;
+        }
+        if (this.originalTheme !== undefined) {
+            const config = vscode.workspace.getConfiguration('workbench');
+            await config.update('colorTheme', this.originalTheme, vscode.ConfigurationTarget.Global);
+        }
     }
 }
