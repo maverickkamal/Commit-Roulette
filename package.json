@@ -46,9 +46,16 @@
         "commitRoulette.enabledCurses": {
           "type": "array",
           "default": [
-            "all"
+            "Color Inverter",
+            "Comic Sans Theme",
+            "Placebo Curse",
+            "Variable Reverser",
+            "Indent Switcher",
+            "Emoji Injector",
+            "Sounds Effect",
+            "Key Lagger"
           ],
-          "description": "Which curses to enable"
+          "description": "List of enabled curses."
         },
         "commitRoulette.soundVolume": {
           "type": "number",
