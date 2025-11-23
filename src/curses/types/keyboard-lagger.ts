@@ -34,9 +34,11 @@ export class KeyboardLagger implements Curse {
             isReapplying = false;
         });
 
+        const durationMinutes = vscode.workspace.getConfiguration('commitRoulette').get<number>('curseDuration') || 5;
+
         setTimeout(() => {
             lagListener.dispose();
             vscode.window.showInformationMessage('Commit Roulette: Keyboard Lagger curse lifted!');
-        }, 2 * 60 * 1000);
+        }, durationMinutes * 60 * 1000);
     }
 }

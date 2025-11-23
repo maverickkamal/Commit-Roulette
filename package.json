@@ -61,6 +61,12 @@
           "type": "number",
           "default": 50,
           "description": "Volume for sound effects (0-100)"
+        },
+        "commitRoulette.curseDuration": {
+          "type": "number",
+          "default": 5,
+          "minimum": 1,
+          "description": "Duration of temporary curses in minutes"
         }
       }
     }

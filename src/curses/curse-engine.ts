@@ -82,7 +82,13 @@ export class CurseEngine {
     }
 
     private selectWeightedCurse(): Curse | undefined {
-        const applicableCurses = this.curses.filter(c => c.canApply());
+        const config = vscode.workspace.getConfiguration('commitRoulette');
+        const enabledCurses = config.get<string[]>('enabledCurses') || [];
+
+        const applicableCurses = this.curses.filter(c => 
+            c.canApply() && enabledCurses.includes(c.name)
+        );
+        
         if (applicableCurses.length === 0) return undefined;
 
         const randomIndex = Math.floor(Math.random() * applicableCurses.length);

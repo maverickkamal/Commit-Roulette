@@ -29,13 +29,15 @@ export class ColorInverter implements Curse {
 
         await config.update('colorTheme', newTheme, vscode.ConfigurationTarget.Global);
 
+        const durationMinutes = vscode.workspace.getConfiguration('commitroulette').get<number>('curseDuration') || 5;
+
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
         this.timeout = setTimeout(async () => {
             await this.undo();
             vscode.window.showInformationMessage('Commit Roulette: Color Inverter curse lifted!');
-        }, 5 * 60 * 1000);
+        }, durationMinutes * 60 * 1000);
     }
 
     async undo(): Promise<void> {

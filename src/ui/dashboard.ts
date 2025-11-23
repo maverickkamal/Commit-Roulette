@@ -30,6 +30,10 @@ export class DashboardPanel {
 
                         await config.update('enabledCurses', enabledCurses, vscode.ConfigurationTarget.Global);
                         return;
+                    case 'updateDuration':
+                        const configDuration = vscode.workspace.getConfiguration('commitRoulette');
+                        await configDuration.update('curseDuration', message.duration, vscode.ConfigurationTarget.Global);
+                        return;
                 }
             },
             null,
@@ -195,6 +199,14 @@ export class DashboardPanel {
             <div class="settings-section">
                 <h2>Settings</h2>
                 <button class="btn" onclick="openSettings()">⚙️ Open Extension Settings</button>
+
+                <div style="margin-top: 20px;">
+                    <h3>Curse Duration</h3>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="range" id="curseDuration" min="1" max="60" value="${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5}" onchange="updateDuration()" oninput="document.getElementById('durationValue').innerText = this.value + ' min'">
+                        <span id="durationValue">${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5} min</span>
+                    </div>
+                </div
                 
                 <h3>Enabled Curses</h3>
                 <div class="curse-toggles">
@@ -258,6 +270,12 @@ export class DashboardPanel {
                         curse: curseName, 
                         enabled: isChecked 
                     });
+                }
+
+                function updateDuration(){
+                    const duration = parseInt(document.getElementById('curseDuration').value);
+                    document.getElementById('durationValue').innerText = duration + ' min';
+                    vscode.postMessage({ command: 'updateDuration', duration: duration });
                 }
             </script>
         </body>

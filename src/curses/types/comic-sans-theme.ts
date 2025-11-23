@@ -19,9 +19,11 @@ export class ComicSansTheme implements Curse {
         this.originalFont = config.get<string>('fontFamily');
 
         await config.update('fontFamily', "'Comic Sans MS', 'Chalkboard SE', 'Comic Nueue', sans-serif", vscode.ConfigurationTarget.Global)
+
+        const durationMinutes = vscode.workspace.getConfiguration('commitRoulette').get<number>('curseDuration') || 5;
         this.timeout = setTimeout(async () => {
             vscode.window.showInformationMessage('Commit Roulette: Comic Sans curse lifted');
-        }, 10 * 60 * 1000);
+        }, durationMinutes * 60 * 1000);
     }
 
     async undo(): Promise<void> {
