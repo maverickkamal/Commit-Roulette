@@ -10,7 +10,9 @@ import {
     IndentSwitcher,
     EmojiInjector,
     SoundEffect,
-    KeyboardLagger
+    KeyboardLagger,
+    AustralianMode,
+    Jitterbug
 } from './types';
 
 
@@ -31,6 +33,8 @@ export class CurseEngine {
         this.curses.push(new EmojiInjector());
         this.curses.push(new SoundEffect());
         this.curses.push(new KeyboardLagger());
+        this.curses.push(new AustralianMode());
+        this.curses.push(new Jitterbug());
     }
 
     async executeCurseRoulette(probability: number): Promise<void> {

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/package.json",
   "name": "commit-roulette",
   "displayName": "Commit Roulette",
   "description": "Random chaos after each commit - all reversible",
@@ -53,7 +54,9 @@
             "Indent Switcher",
             "Emoji Injector",
             "Sounds Effect",
-            "Key Lagger"
+            "Key Lagger",
+            "Australian Mode",
+            "The Jitterbug"
           ],
           "description": "List of enabled curses."
         },

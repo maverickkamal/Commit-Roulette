@@ -137,7 +137,8 @@ export class DashboardPanel {
         const curseTypes = [
             'Variable Reverser', 'Emoji Injector', 'Comic Sans Theme',
             'Sound Effect', 'Color Inverter', 'Keyboard Lagger',
-            'Indent Switcher', 'Placebo Curse'
+            'Indent Switcher', 'Placebo Curse', 'The Jitterbug',
+            'Australian Mode'
         ];
 
         const config = vscode.workspace.getConfiguration('commitRoulette');
@@ -158,37 +159,122 @@ export class DashboardPanel {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Commit Roulette Stats</title>
+            <title>Commit Roulette Dashboard</title>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <style>
-                body { font-family: var(--vscode-font-family); padding: 20px; color: var(--vscode-editor-foreground); }
-                h1 { text-align: center; }
-                .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-                .stat-card { background: var(--vscode-editor-background); border: 1px solid var(--vscode-widget-border); padding: 15px; border-radius: 5px; text-align: center; }
-                .stat-value { font-size: 2em; font-weight: bold; color: var(--vscode-textLink-foreground); }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--vscode-widget-border); }
-                th { background-color: var(--vscode-editor-inactiveSelectionBackground); }
-                .chart-container { position: relative; height: 300px; width: 100%; margin-bottom: 30px; }
-                
-                .settings-section { margin-top: 40px; border-top: 1px solid var(--vscode-widget-border); padding-top: 20px; }
-                .curse-toggles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 15px; }
-                .curse-toggle { display: flex; align-items: center; gap: 10px; }
-                .btn { display: inline-block; padding: 8px 16px; background: var(--vscode-button-background); color: var(--vscode-button-foreground); text-decoration: none; border-radius: 2px; cursor: pointer; border: none; }
-                .btn:hover { background: var(--vscode-button-hoverBackground); }
+                :root {
+                    --neon-red: #ff003c;
+                    --neon-blue: #00f3ff;
+                    --neon-green: #00ff41;
+                    --bg-dark: #0a0a0a;
+                    --card-bg: #1a1a1a;
+                }
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    padding: 20px;
+                    background-color: var(--bg-dark);
+                    color: #fff;
+                    text-align: center;
+                }
+                h1 {
+                    font-size: 3em;
+                    text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
+                    margin-bottom: 30px;
+                    animation: flicker 2s infinite alternate;
+                }
+                .stats-container {
+                    display: flex;
+                    justify-content: space-around;
+                    margin-bottom: 40px;
+                    flex-wrap: wrap;
+                }
+                .stat-card {
+                    background-color: var(--card-bg);
+                    border: 1px solid var(--neon-blue);
+                    border-radius: 10px;
+                    padding: 20px;
+                    width: 200px;
+                    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+                    transition: transform 0.3s;
+                    margin: 10px;
+                }
+                .stat-card:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 0 25px rgba(0, 243, 255, 0.4);
+                }
+                .stat-value {
+                    font-size: 2.5em;
+                    font-weight: bold;
+                    color: var(--neon-green);
+                    text-shadow: 0 0 5px var(--neon-green);
+                }
+                .stat-label {
+                    font-size: 1em;
+                    color: #aaa;
+                }
+                .chart-container {
+                    background-color: var(--card-bg);
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin-bottom: 40px;
+                    border: 1px solid #333;
+                }
+                .settings-container {
+                    background-color: var(--card-bg);
+                    padding: 20px;
+                    border-radius: 10px;
+                    border: 1px solid var(--neon-red);
+                    text-align: left;
+                }
+                .curse-toggles {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 10px;
+                    margin-top: 15px;
+                }
+                .curse-toggle {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+                .curse-toggle input[type="checkbox"] {
+                    transform: scale(1.2);
+                    accent-color: var(--neon-red);
+                }
+                .slider-container {
+                    margin-top: 20px;
+                    padding: 10px;
+                    border-top: 1px solid #333;
+                }
+                input[type="range"] {
+                    width: 100%;
+                    accent-color: var(--neon-red);
+                }
+                @keyframes flicker {
+                    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                        text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
+                    }
+                    20%, 24%, 55% {
+                        text-shadow: none;
+                    }
+                }
             </style>
         </head>
         <body>
-            <h1>🎲 Commit Roulette Stats</h1>
+            <h1>🎰 Commit Roulette 🎰</h1>
             
-            <div class="stats-grid">
+            <div class="stats-container">
                 <div class="stat-card">
                     <div class="stat-value">${stats.totalCurses}</div>
-                    <div>Total Curses</div>
+                    <div class="stat-label">Total Curses</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">${stats.activeStreak || 0}</div>
-                    <div>Current Streak</div>
+                    <div class="stat-value">${stats.activeStreak}</div>
+                    <div class="stat-label">Current Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${(stats.probability * 100).toFixed(1)}%</div>
+                    <div class="stat-label">Current Probability</div>
                 </div>
             </div>
 
@@ -196,43 +282,17 @@ export class DashboardPanel {
                 <canvas id="curseChart"></canvas>
             </div>
 
-            <div class="settings-section">
-                <h2>Settings</h2>
-                <button class="btn" onclick="openSettings()">⚙️ Open Extension Settings</button>
-
-                <div style="margin-top: 20px;">
-                    <h3>Curse Duration</h3>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="range" id="curseDuration" min="1" max="60" value="${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5}" onchange="updateDuration()" oninput="document.getElementById('durationValue').innerText = this.value + ' min'">
-                        <span id="durationValue">${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5} min</span>
-                    </div>
-                </div
-                
-                <h3>Enabled Curses</h3>
+            <div class="settings-container">
+                <h2 style="color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red);">⚙️ Active Curses</h2>
                 <div class="curse-toggles">
                     ${curseToggles}
                 </div>
+                
+                <div class="slider-container">
+                    <label for="curseDuration">⏱️ Curse Duration (minutes): <span id="durationValue">${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5}</span></label>
+                    <input type="range" id="curseDuration" min="1" max="60" value="${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5}" onchange="updateDuration()" oninput="document.getElementById('durationValue').innerText = this.value">
+                </div>
             </div>
-
-            <h2>Recent History</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Time</th>
-                        <th>Curse</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${history.map(h => `
-                        <tr>
-                            <td>${new Date(h.timestamp).toLocaleString()}</td>
-                            <td>${h.curseType}</td>
-                            <td>${h.wasUndone ? 'Undone' : 'Applied'}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
 
             <script>
                 const vscode = acquireVsCodeApi();
@@ -246,22 +306,20 @@ export class DashboardPanel {
                         datasets: [{
                             data: ${JSON.stringify(Object.values(stats.curseBreakdown))},
                             backgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF', '#7BC225'
-                            ]
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF', '#7BC225', '#FF003C', '#00F3FF'
+                            ],
+                            borderColor: '#1a1a1a',
+                            borderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { position: 'right', labels: { color: '#ccc' } }
+                            legend: { position: 'right', labels: { color: '#fff', font: { size: 14 } } }
                         }
                     }
                 });
-
-                function openSettings() {
-                    vscode.postMessage({ command: 'openSettings' });
-                }
 
                 function toggleCurse(curseName) {
                     const isChecked = document.getElementById(curseName).checked;
@@ -272,10 +330,13 @@ export class DashboardPanel {
                     });
                 }
 
-                function updateDuration(){
+                function updateDuration() {
                     const duration = parseInt(document.getElementById('curseDuration').value);
-                    document.getElementById('durationValue').innerText = duration + ' min';
-                    vscode.postMessage({ command: 'updateDuration', duration: duration });
+                    document.getElementById('durationValue').innerText = duration;
+                    vscode.postMessage({ 
+                        command: 'updateDuration', 
+                        duration: duration 
+                    });
                 }
             </script>
         </body>
