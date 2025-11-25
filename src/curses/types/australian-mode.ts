@@ -10,13 +10,19 @@ export class AustralianMode implements Curse {
     }
 
     private originalContent: string | undefined;
+    private documentUri: vscode.Uri | undefined;
     private timeout: NodeJS.Timeout | undefined;
 
     async apply(): Promise<void> {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
 
+        if (this.originalContent) {
+            await this.undo();
+        }
+
         const document = editor.document;
+        this.documentUri = document.uri;
         this.originalContent = document.getText();
 
         const lines = this.originalContent.split('\n');
@@ -47,19 +53,25 @@ export class AustralianMode implements Curse {
             this.timeout = undefined;
         }
 
-        const editor = vscode.window.activeTextEditor;
-        if (editor && this.originalContent) {
-            const document = editor.document;
-            const fullRange = new vscode.Range(
-                document.positionAt(0),
-                document.positionAt(document.getText().length)
-            );
+        if (this.originalContent && this.documentUri) {
+            const editor = vscode.window.visibleTextEditors.find(e => e.document.uri.toString() === this.documentUri?.toString());
+            if (editor) {
+        
+                const document = editor.document;
+                const fullRange = new vscode.Range(
+                    document.positionAt(0),
+                    document.positionAt(document.getText().length)
+                );
 
-            await editor.edit(editBuilder => {
-                editBuilder.replace(fullRange, this.originalContent!);
-            });
+                await editor.edit(editBuilder => {
+                    editBuilder.replace(fullRange, this.originalContent!);
+                });
+            } else {
+                vscode.window.showWarningMessage('Commit Roulette: Could not restore Australian Mode (file closed)');
+            }
 
             this.originalContent = undefined;
+            this.documentUri = undefined;
         }
     }
 }

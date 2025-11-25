@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { HistoryStore } from '../storage/history';
+import { TextDecoder } from 'util';
 
 export class DashboardPanel {
     public static currentPanel: DashboardPanel | undefined;
@@ -60,7 +61,7 @@ export class DashboardPanel {
             column || vscode.ViewColumn.One,
             {
                 enableScripts: true,
-                localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')]
+                localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'src', 'media')]
             }
         );
 
@@ -130,216 +131,45 @@ export class DashboardPanel {
             activeStreak
         };
 
-        return this.getWebviewContent(stats, history.slice().reverse());
+        return this.getWebviewContent(webview, stats, history.slice().reverse());
     }
 
-    private getWebviewContent(stats: any, history: any[]) {
-        const curseTypes = [
-            'Variable Reverser', 'Emoji Injector', 'Comic Sans Theme',
-            'Sound Effect', 'Color Inverter', 'Keyboard Lagger',
-            'Indent Switcher', 'Placebo Curse', 'The Jitterbug',
-            'Australian Mode'
-        ];
+    private async getWebviewContent(webview: vscode.Webview, stats: any, history: any[]) {
+        const mediaPath = vscode.Uri.joinPath(this.extensionUri, 'src', 'media');
+        const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'dashboard.css'));
+        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(mediaPath, 'dashboard.js'));
+        const htmlUri = vscode.Uri.joinPath(mediaPath, 'dashboard.html');
+
+        let htmlContent = '';
+        try {
+            const uint8Array = await vscode.workspace.fs.readFile(htmlUri);
+            htmlContent = new TextDecoder().decode(uint8Array);
+        } catch (error) {
+            console.error('Error reading dashboard.html:', error);
+            return `<h1>Error loading dashboard</h1><p>${error}</p>`;
+        }
 
         const config = vscode.workspace.getConfiguration('commitRoulette');
-        const enabledCurses = config.get<string[]>('enabledCurses') || [];
+        const curseDuration = config.get('curseDuration') || 5;
 
-        const curseToggles = curseTypes.map(curse => {
-            const isChecked = enabledCurses.includes(curse) ? 'checked' : '';
-            return `
-                <div class="curse-toggle">
-                    <input type="checkbox" id="${curse}" ${isChecked} onchange="toggleCurse('${curse}')">
-                    <label for="${curse}">${curse}</label>
-                </div>
-            `;
-        }).join('');
+        const initialData = {
+            stats,
+            history,
+            config: {
+                enabledCurses: config.get<string[]>('enabledCurses') || []
+            }
+        };
 
-        return `<!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Commit Roulette Dashboard</title>
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <style>
-                :root {
-                    --neon-red: #ff003c;
-                    --neon-blue: #00f3ff;
-                    --neon-green: #00ff41;
-                    --bg-dark: #0a0a0a;
-                    --card-bg: #1a1a1a;
-                }
-                body {
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    padding: 20px;
-                    background-color: var(--bg-dark);
-                    color: #fff;
-                    text-align: center;
-                }
-                h1 {
-                    font-size: 3em;
-                    text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
-                    margin-bottom: 30px;
-                    animation: flicker 2s infinite alternate;
-                }
-                .stats-container {
-                    display: flex;
-                    justify-content: space-around;
-                    margin-bottom: 40px;
-                    flex-wrap: wrap;
-                }
-                .stat-card {
-                    background-color: var(--card-bg);
-                    border: 1px solid var(--neon-blue);
-                    border-radius: 10px;
-                    padding: 20px;
-                    width: 200px;
-                    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
-                    transition: transform 0.3s;
-                    margin: 10px;
-                }
-                .stat-card:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 0 25px rgba(0, 243, 255, 0.4);
-                }
-                .stat-value {
-                    font-size: 2.5em;
-                    font-weight: bold;
-                    color: var(--neon-green);
-                    text-shadow: 0 0 5px var(--neon-green);
-                }
-                .stat-label {
-                    font-size: 1em;
-                    color: #aaa;
-                }
-                .chart-container {
-                    background-color: var(--card-bg);
-                    padding: 20px;
-                    border-radius: 10px;
-                    margin-bottom: 40px;
-                    border: 1px solid #333;
-                }
-                .settings-container {
-                    background-color: var(--card-bg);
-                    padding: 20px;
-                    border-radius: 10px;
-                    border: 1px solid var(--neon-red);
-                    text-align: left;
-                }
-                .curse-toggles {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                    gap: 10px;
-                    margin-top: 15px;
-                }
-                .curse-toggle {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                }
-                .curse-toggle input[type="checkbox"] {
-                    transform: scale(1.2);
-                    accent-color: var(--neon-red);
-                }
-                .slider-container {
-                    margin-top: 20px;
-                    padding: 10px;
-                    border-top: 1px solid #333;
-                }
-                input[type="range"] {
-                    width: 100%;
-                    accent-color: var(--neon-red);
-                }
-                @keyframes flicker {
-                    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-                        text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red);
-                    }
-                    20%, 24%, 55% {
-                        text-shadow: none;
-                    }
-                }
-            </style>
-        </head>
-        <body>
-            <h1>🎰 Commit Roulette 🎰</h1>
-            
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-value">${stats.totalCurses}</div>
-                    <div class="stat-label">Total Curses</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${stats.activeStreak}</div>
-                    <div class="stat-label">Current Streak</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${(stats.probability * 100).toFixed(1)}%</div>
-                    <div class="stat-label">Current Probability</div>
-                </div>
-            </div>
+        htmlContent = htmlContent
+            .replace(/{{cspSource}}/g, webview.cspSource)
+            .replace(/{{styleUri}}/g, styleUri.toString())
+            .replace(/{{scriptUri}}/g, scriptUri.toString())
+            .replace(/{{totalCurses}}/g, stats.totalCurses.toString())
+            .replace(/{{activeStreak}}/g, stats.activeStreak.toString())
+            .replace(/{{currentProbability}}/g, (stats.probability * 100).toFixed(1))
+            .replace(/{{curseDuration}}/g, curseDuration.toString())
+            .replace(/"{{initialData}}"/g, JSON.stringify(initialData));
 
-            <div class="chart-container">
-                <canvas id="curseChart"></canvas>
-            </div>
-
-            <div class="settings-container">
-                <h2 style="color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red);">⚙️ Active Curses</h2>
-                <div class="curse-toggles">
-                    ${curseToggles}
-                </div>
-                
-                <div class="slider-container">
-                    <label for="curseDuration">⏱️ Curse Duration (minutes): <span id="durationValue">${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5}</span></label>
-                    <input type="range" id="curseDuration" min="1" max="60" value="${vscode.workspace.getConfiguration('commitRoulette').get('curseDuration') || 5}" onchange="updateDuration()" oninput="document.getElementById('durationValue').innerText = this.value">
-                </div>
-            </div>
-
-            <script>
-                const vscode = acquireVsCodeApi();
-                
-                // Chart
-                const ctx = document.getElementById('curseChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ${JSON.stringify(Object.keys(stats.curseBreakdown))},
-                        datasets: [{
-                            data: ${JSON.stringify(Object.values(stats.curseBreakdown))},
-                            backgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF', '#7BC225', '#FF003C', '#00F3FF'
-                            ],
-                            borderColor: '#1a1a1a',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'right', labels: { color: '#fff', font: { size: 14 } } }
-                        }
-                    }
-                });
-
-                function toggleCurse(curseName) {
-                    const isChecked = document.getElementById(curseName).checked;
-                    vscode.postMessage({ 
-                        command: 'toggleCurse', 
-                        curse: curseName, 
-                        enabled: isChecked 
-                    });
-                }
-
-                function updateDuration() {
-                    const duration = parseInt(document.getElementById('curseDuration').value);
-                    document.getElementById('durationValue').innerText = duration;
-                    vscode.postMessage({ 
-                        command: 'updateDuration', 
-                        duration: duration 
-                    });
-                }
-            </script>
-        </body>
-        </html>`;
+        return htmlContent;
     }
 }
