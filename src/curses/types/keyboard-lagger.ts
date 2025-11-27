@@ -3,11 +3,14 @@ import { Curse } from '../curse.interface';
 
 export class KeyboardLagger implements Curse {
     name = "Keyboard Lagger";
-    description = "Simulates keyboard lag by delaying inputs or edits";
+    description = "Simulates keyboard lag by delaying edits";
 
     canApply(): boolean {
         return !!vscode.window.activeTextEditor;
     }
+
+    private lagListener: vscode.Disposable | undefined;
+    private timeout: NodeJS.Timeout | undefined;
 
     async apply(): Promise<void> {
         const activeEditor = vscode.window.activeTextEditor;
@@ -15,11 +18,14 @@ export class KeyboardLagger implements Curse {
 
         let isReapplying = false;
 
-        const lagListener = vscode.workspace.onDidChangeTextDocument(async (event) => {
+        this.lagListener = vscode.workspace.onDidChangeTextDocument(async (event) => {
             if (isReapplying || event.document !== activeEditor.document) return;
             if (event.contentChanges.length === 0) return;
 
+            if (event.contentChanges.length > 1 || event.contentChanges[0].text.length > 1) return;
+
             isReapplying = true;
+
 
             await vscode.commands.executeCommand('undo');
 
@@ -32,9 +38,20 @@ export class KeyboardLagger implements Curse {
 
         const durationMinutes = vscode.workspace.getConfiguration('commitRoulette').get<number>('curseDuration') || 5;
 
-        setTimeout(() => {
-            lagListener.dispose();
-            vscode.window.showInformationMessage('Commit Roulette: Keyboard Lagger curse lifted!');
+        this.timeout = setTimeout(() => {
+            this.undo();
+            vscode.window.showInformationMessage('Commit Roulette: Keyboard Lag curse lifted!');
         }, durationMinutes * 60 * 1000);
+    }
+
+    async undo(): Promise<void> {
+        if (this.lagListener) {
+            this.lagListener.dispose();
+            this.lagListener = undefined;
+        }
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+            this.timeout = undefined;
+        }
     }
 }
