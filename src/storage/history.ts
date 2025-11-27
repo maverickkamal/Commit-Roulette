@@ -19,7 +19,6 @@ export class HistoryStore {
 
     async getHistory(): Promise<CurseHistoryEntry[]> {
         return this.context.globalState.get<CurseHistoryEntry[]>('history', []);
-    
     }
 
     async getLastEntry(): Promise<CurseHistoryEntry | undefined> {

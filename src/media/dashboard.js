@@ -29,18 +29,18 @@ new Chart(ctx, {
 const curseTypes = [
     'Variable Reverser', 'Emoji Injector', 'Comic Sans Theme',
     'Sound Effect', 'Color Inverter', 'Keyboard Lagger',
-    'Indent Switcher', 'Placebo Curse', 'The Jitterbug', 'Australian Mode'
+    'Indent Switcher', 'Placebo Curse', 'The Jitterbug (File Hopper)', 'Australian Mode'
 ];
 
 const togglesContainer = document.getElementById('curse-toggles');
 const enabledCurses = config.enabledCurses || [];
 
 curseTypes.forEach(curse => {
-    const isCHecked = enabledCurses.includes(curse) ? 'checked': '';
+    const isChecked = enabledCurses.includes(curse) ? 'checked': '';
     const div = document.createElement('div');
     div.className = 'curse-toggle';
     div.innerHTML = `
-        <input type="checkbox" id="${curse}" ${isCHecked}>
+        <input type="checkbox" id="${curse}" ${isChecked}>
         <label for="${curse}">${curse}</label>
     `;
     togglesContainer.appendChild(div);

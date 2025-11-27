@@ -28,11 +28,11 @@ export class IndentSwitcher implements Curse {
         if (insertSpaces) {
             editor.options = { insertSpaces: false, tabSize: newTabSize };
             await vscode.commands.executeCommand('editor.action.indentationToTabs');
-            vscode.window.showInformationMessage(`Commit Roulette: Converted to TABS (Size ${newTabSize})! 😈`);
+            vscode.window.showInformationMessage(`Commit Roulette: Converted to TABS (Size ${newTabSize})!`);
         } else {
             editor.options = { insertSpaces: true, tabSize: newTabSize };
             await vscode.commands.executeCommand('editor.action.indentationToSpaces');
-            vscode.window.showInformationMessage(`Commit Roulette: Converted to SPACES (Size ${newTabSize})! 😈`);
+            vscode.window.showInformationMessage(`Commit Roulette: Converted to SPACES (Size ${newTabSize})!`);
         }
 
         await vscode.commands.executeCommand('editor.action.formatDocument');

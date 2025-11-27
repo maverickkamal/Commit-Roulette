@@ -113,6 +113,7 @@ export class DashboardPanel {
                     if (!entry.wasUndone) {
                         const entryDay = Math.floor(entry.timestamp / oneDay);
                         if (entryDay === previousDay) {
+                            // Same day, continue tracking
                         } else if (entryDay === previousDay - 1) {
                             currentStreak++;
                             previousDay = entryDay;

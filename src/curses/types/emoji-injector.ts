@@ -3,7 +3,7 @@ import { Curse } from '../curse.interface';
 
 export class EmojiInjector implements Curse {
     name = "Emoji Injector";
-    description = "Adds  random emojis to comments and now strings";
+    description = "Adds random emojis to comments and strings";
 
     canApply(): boolean {
       
@@ -37,7 +37,7 @@ export class EmojiInjector implements Curse {
             await editor.edit(editBuilder => {
                 edits.forEach(edit => editBuilder.insert(edit.range.start, edit.newText));
             }); 
-            vscode.window.showInformationMessage(`Commit Roulette: Injected ${edits.length} emojis!!!!!!!!!!!!`)
+            vscode.window.showInformationMessage(`Commit Roulette: Injected ${edits.length} emojis`)
         }
     }
 }

@@ -2,48 +2,77 @@ import * as vscode from 'vscode';
 import { Curse } from '../curse.interface';
 
 export class Jitterbug implements Curse {
-    name = "The Jitterbug";
-    description = "It simulates an earthquake by shaking the screen (rapid scrolling)"
+    name = "The Jitterbug (File Hopper)";
+    description = "Randomly switches between open files and leaves 'helpful' comments.";
 
     canApply(): boolean {
-        return !!vscode.window.activeTextEditor;
+        return vscode.workspace.textDocuments.length > 1;
     }
 
-    async apply(): Promise<void> {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) return;
+    private isRunning = false;
+    private comments = [
+        "// Did you mean to write this?",
+        "// This looks suspicious...",
+        "// TODO: Rewrite this entire file",
+        "// I'm watching you...",
+        "// Bug detected (maybe), ha!",
+        "// ¯\\_(ツ)_/¯",
+        "// This code is cursed",
+        "// Have you tried turning it off and on again?"
+    ];
 
+    async apply(): Promise<void> {
+        this.isRunning = true;
         const durationMinutes = vscode.workspace.getConfiguration('commitRoulette').get<number>('curseDuration') || 5;
         const endTime = Date.now() + (durationMinutes * 60 * 1000);
 
-        const interval = setInterval(async () => {
-            if (Date.now() > endTime || !vscode.window.activeTextEditor) {
-                clearInterval(interval);
-                vscode.window.showInformationMessage('Commit Roulette: The earth stands still again.');
-                return;
-            }
+        this.hopLoop(endTime);
+    }
 
-            const activeEditor = vscode.window.activeTextEditor;
-            if (!activeEditor) {
-                const direction = Math.random() > 0.5 ? 'up' : 'down';
-                await vscode.commands.executeCommand('editorScroll', {
-                    to: direction,
-                    by: 'line',
-                    value: 1,
-                    revealCursor: false
+    private async hopLoop(endTime: number) {
+        if (!this.isRunning) return;
+
+        if (Date.now() > endTime) {
+            this.stop();
+            vscode.window.showInformationMessage('Commit Roulette: The hopping has stopped.');
+            return;
+        }
+
+        try {
+            const documents = vscode.workspace.textDocuments.filter(doc => !doc.isClosed && doc.uri.scheme === 'file');
+
+            if (documents.length > 0) {
+                const randomDoc = documents[Math.floor(Math.random() * documents.length)];
+
+                const editor = await vscode.window.showTextDocument(randomDoc, {
+                    preview: false,
+                    preserveFocus: false
                 });
 
-                setTimeout(async () => {
-                    await vscode.commands.executeCommand('editorScroll', {
-                        to: direction === 'up' ? 'down' : 'up',
-                        by: 'line',
-                        value: 1,
-                        revealCursor: false
-                    });
-                }, 50);
-            }  
-        }, 3000);
+                const lineCount = randomDoc.lineCount;
+                const randomLine = Math.floor(Math.random() * lineCount);
+                const randomComment = this.comments[Math.floor(Math.random() * this.comments.length)];
+
+                await editor.edit(editBuilder => {
+                    const position = new vscode.Position(randomLine, 0);
+                    editBuilder.insert(position, `${randomComment}\n`);
+                });
+            }
+        } catch (e) {
+            console.error('File Hopper error:', e);
+        }
+
+        if (this.isRunning) {
+            setTimeout(() => this.hopLoop(endTime), 30000);
+        }
+    }
+
+    async undo(): Promise<void> {
+        this.stop();
+        vscode.window.showInformationMessage('Commit Roulette: File Hopper stopped. You might want to check your files for comments!');
+    }
+
+    private stop() {
+        this.isRunning = false;
     }
 }
-
-

@@ -101,7 +101,7 @@ export class CurseEngine {
 
     private async showCurseNotification(curse: Curse, backupId: string): Promise<void> {
         const undo = 'Undo Curse';
-        const message = `🎲 You've been cursed! (${curse.name})`;
+        const message = `You've been cursed! (${curse.name})`;
 
         const selection = await vscode.window.showWarningMessage(message, undo, 'Accept Fate');
 

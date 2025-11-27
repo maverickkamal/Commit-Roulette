@@ -53,10 +53,10 @@
             "Variable Reverser",
             "Indent Switcher",
             "Emoji Injector",
-            "Sounds Effect",
-            "Key Lagger",
+            "Sound Effect",
+            "Keyboard Lagger",
             "Australian Mode",
-            "The Jitterbug"
+            "The Jitterbug (File Hopper)"
           ],
           "description": "List of enabled curses."
         },

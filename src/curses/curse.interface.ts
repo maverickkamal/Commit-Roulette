@@ -3,7 +3,6 @@ export interface Curse {
     description: string;
     canApply(): boolean;
     apply(): Promise<void>;
-    undo?(): Promise<void>
+    undo?(): Promise<void>;
     getDuration?(): number;
-
 }

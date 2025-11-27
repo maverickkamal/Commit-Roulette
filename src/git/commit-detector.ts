@@ -29,8 +29,8 @@ export class CommitDetector {
         } catch (e: any) {
             if (e.message && e.message.includes('does not have any commits yet')) {
                 console.log('CommitRoulette: Repository is empty. Waiting for first commit.');
-                this.lastHash = ''
-;            } else {
+                this.lastHash = '';
+            } else {
                 console.log('CommitRoulette: Not a git repo or error getting log', e);
             }
         }

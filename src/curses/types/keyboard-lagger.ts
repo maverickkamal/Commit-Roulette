@@ -10,10 +10,6 @@ export class KeyboardLagger implements Curse {
     }
 
     async apply(): Promise<void> {
-        const disposable = vscode.workspace.onDidChangeTextDocument(async (e) => {
-            if (e.contentChanges.length === 0) return;
-        });
-
         const activeEditor = vscode.window.activeTextEditor;
         if (!activeEditor) return;
 

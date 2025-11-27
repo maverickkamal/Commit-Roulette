@@ -80,7 +80,6 @@ export class BackupManager {
                 for (let i = 3; i < entries.length; i++) {
                     const dirToDelete = vscode.Uri.joinPath(this.backupDir, entries[i][0]);
                     await vscode.workspace.fs.delete(dirToDelete, { recursive: true });
-                
                 }
             }
         } catch (e) {

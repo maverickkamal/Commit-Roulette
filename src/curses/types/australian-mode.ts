@@ -33,18 +33,25 @@ export class AustralianMode implements Curse {
             document.positionAt(this.originalContent.length)
         );
 
-        await editor.edit(editBuilder => {
-            editBuilder.replace(fullRange, reversedLines);
-        });
+        try {
+            await editor.edit(editBuilder => {
+                editBuilder.replace(fullRange, reversedLines);
+            });
 
-        vscode.window.showInformationMessage('Commit Roulette: G\'day mate! aye');
+            vscode.window.showInformationMessage('Commit Roulette: G\'day mate! aye');
+        } catch (error) {
+            console.error('Commit Roulette: Australian Mode failed to apply', error);
+            this.originalContent = undefined;
+            this.documentUri = undefined;
+            return;
+        }
 
         const durationMinutes = vscode.workspace.getConfiguration('commitRoulette').get<number>('curseDuration') || 5;
 
         this.timeout = setTimeout(async () => {
             await this.undo();
             vscode.window.showInformationMessage('Commit Roulette: Back to the northern hemisphere!');
-        }, durationMinutes * 50 * 1000);
+        }, durationMinutes * 60 * 1000);
     }
 
     async undo(): Promise<void> {

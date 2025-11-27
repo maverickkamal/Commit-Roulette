@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { Curse } from '../curse.interface';
-import exp = require('constants');
 
 export class ComicSansTheme implements Curse {
     name = "Comic Sans Theme";
@@ -18,7 +17,7 @@ export class ComicSansTheme implements Curse {
         const config = vscode.workspace.getConfiguration('editor');
         this.originalFont = config.get<string>('fontFamily');
 
-        await config.update('fontFamily', "'Comic Sans MS', 'Chalkboard SE', 'Comic Nueue', sans-serif", vscode.ConfigurationTarget.Global)
+        await config.update('fontFamily', "'Comic Sans MS', 'Chalkboard SE', 'Comic Nueue', sans-serif", vscode.ConfigurationTarget.Global);
 
         const durationMinutes = vscode.workspace.getConfiguration('commitRoulette').get<number>('curseDuration') || 5;
         this.timeout = setTimeout(async () => {
