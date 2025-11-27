@@ -10,48 +10,20 @@ export class SoundEffect implements Curse {
     }
 
     async apply(): Promise<void> {
-        const panel = vscode.window.createWebviewPanel(
-            'commitRouletteSound',
-            'Commit Roulette Sound',
-            vscode.ViewColumn.Beside,
-            {
-                enableScripts: true,
-                retainContextWhenHidden: true
-            }
-        );
+        const cp = require('child_process');
+        const volume = vscode.workspace.getConfiguration('commitRoulette').get<number>('soundVolume') || 50;
 
-        const soundUrl = 'https://www.actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg';
+        if (volume === 0) {
+            return;
+        }
 
-        panel.webview.html = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta http-equiv="Content-Security-Policy" content="default-src *; media-src *;">
-            </head>
-            <body>
-                <p>Playing sound...</p>
-                <audio autoplay src="${soundUrl}" onended="end()" onerror="err()"></audio>
-                <script>
-                    const vscode = acquireVsCodeApi();
-                    function end() {
-                        vscode.postMessage({ command: 'finished' });
-                    }
-                    function err() {
-                        console.error('Audio failed to load');
-                        vscode.postMessage({ command: 'finished' });
-                    }
-                    setTimeout(end, 3000);
-                </script>
-            </body>
-            </html>
-        `;
+        const command = `powershell -c "[System.Console]::Beep(800, 200); [System.Console]::Beep(600, 200); [System.Console]::Beep(400, 400)"`;
 
-        panel.webview.onDidReceiveMessage(message => {
-            if (message.command === 'finished') {
-                panel.dispose();
+        cp.exec(command, (err: any, stdout: any, stderr: any) => {
+            if (err) {
+                console.error('CommitRoulette: Sound failed', err);
+                vscode.window.showErrorMessage('Commit Roulette: Failed to play sound (PowerShell error).');
             }
         });
-
-        setTimeout(() => panel.dispose(), 5000);
     }
 }
