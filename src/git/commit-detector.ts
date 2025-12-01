@@ -18,14 +18,17 @@ export class CommitDetector {
 
         this.startWatching();
     }
-    
+
     async startWatching() {
         if (this.isWatching) return;
         this.isWatching = true;
-        
+
         try {
-            const log = await this.git.log({ maxCount: 1 });
-            this.lastHash = log.latest?.hash || '';
+            const isRepo = await this.git.checkIsRepo();
+            if (isRepo) {
+                const log = await this.git.log({ maxCount: 1 });
+                this.lastHash = log.latest?.hash || '';
+            }
         } catch (e: any) {
             if (e.message && e.message.includes('does not have any commits yet')) {
                 console.log('CommitRoulette: Repository is empty. Waiting for first commit.');
@@ -52,10 +55,15 @@ export class CommitDetector {
 
         setInterval(() => this.checkForCommit(), 10000);
     }
-    
+
     async checkForCommit(): Promise<boolean> {
 
         try {
+            const isRepo = await this.git.checkIsRepo();
+            if (!isRepo) {
+                return false;
+            }
+
             const log = await this.git.log({ maxCount: 1 });
             const currentHash = log.latest?.hash;
 
@@ -68,9 +76,12 @@ export class CommitDetector {
                 this._onCommitDetected.fire(currentHash);
                 // this._onCommitDetected.fire();
                 return true;
-            
+
             }
-        } catch (e) {
+        } catch (e: any) {
+            if (e.message && e.message.includes('does not have any commits yet')) {
+                return false;
+            }
             console.log('CommitRoulette: Error checking for commit', e);
         }
         return false;
