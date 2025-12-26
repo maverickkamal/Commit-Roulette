@@ -6,6 +6,12 @@ Commit Roulette is a VS Code extension designed for streamers, content creators,
 
 Don't worry, everything is reversible!
 
+<img width="1138" height="872" alt="Screenshot 2025-11-27 015814" src="https://github.com/user-attachments/assets/2330f30c-4ad1-41c7-9af5-8309c6708862" />
+
+
+<img width="1138" height="872" alt="Screenshot 2025-11-27 015814" src="https://github.com/user-attachments/assets/b994af28-d633-40e9-a0c8-cf1106f89c48" />
+
+
 ## Features
 
 ### The Curses
